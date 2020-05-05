@@ -1,0 +1,178 @@
+{% load static %}
+{% load extra_tag %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Cash Manager</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css"
+          integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+            integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+            crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"
+            integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49"
+            crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"
+            integrity="sha384-smHYKdLADwkXOn1EmN1qk/HfnUcbVRZyYmZ4qpPea6sjB/pTJ0euyQp0Mk8ck+5T"
+            crossorigin="anonymous"></script>
+</head>
+<body>
+<div class="container">
+    <div class="row">
+        <div class="col">
+            <table class="table table-striped">
+                <thead>
+                <tr>
+                    <th scope="col">ID</th>
+                    <th scope="col">日期</th>
+                    <th scope="col">投入</th>
+                    <th scope="col">净值</th>
+                    <th scope="col">份额</th>
+                    <th scope="col">手续费</th>
+                    <th scope="col">动作</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% all_item as item_list %}
+                {% for item in item_list %}
+                    <tr>
+                        <th scope="row">{{ item.pk }}</th>
+                        <td>{{ item.created_time.year }}年{{ item.created_time.month }}月{{ item.created_time.day }}日</td>
+                        <td>{{ item.investment }}</td>
+                        <td>{{ item.worth }}</td>
+                        <td>{{ item.share }}</td>
+                        <td>{{ item.fee }}</td>
+                        <td>
+                            <a class="btn btn-primary">Del</a>
+                        </td>
+                    </tr>
+
+                {% endfor %}
+                </tbody>
+            </table>
+
+        </div>
+        <div class="col">
+            <div class="row">
+                <div class="card" style="width: 100%">
+                    <div class="card-header">
+                        总计<span><a class="btn btn-light float-right" href="{% url 'Cash:index' %}">更新</a> </span>
+                    </div>
+                    <div class="card-body">
+                        <table class="table table-striped">
+                            <thead>
+                            <tr>
+                                <th scope="col">投入</th>
+                                <th scope="col">份额</th>
+                                <th scope="col">平均成本</th>
+                                <th scope="col">手续费</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr>
+                                <td>{{ sum_inv }}</td>
+                                <td>{{ sum_share }}</td>
+                                <td>{{ avg }}</td>
+                                <td>{{ sum_fee }}</td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="card" style="width: 100%">
+                    <div class="card-header">
+                        新建/更新
+                    </div>
+                    <div class="card-body">
+                        <form method="post" action="{% url 'Cash:edit_form' %}">
+                            {% csrf_token %}
+                            <div class="form-row">
+                                <div class="form-group col-md-6">
+                                    <label for="inputPK">ID</label>
+                                    <input type="text" class="form-control" id="inputPK" value=0 name="item_pk">
+                                </div>
+                                <div class="form-group col-md-6">
+                                    <label for="inputDate">日期</label>
+                                    <input type="date" class="form-control" id="inputDate" name="item_date">
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group col-md-6">
+                                    <label for="inputInvestment">投入</label>
+                                    <input type="text" class="form-control" id="inputInvestment" name="item_inv">
+                                </div>
+                                <div class="form-group col-md-6">
+                                    <label for="inputShare">份额</label>
+                                    <input type="text" class="form-control" id="inputShare" name="item_share">
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group col-md-6">
+                                    <label for="inputWorth">净值</label>
+                                    <input type="text" class="form-control" id="inputWorth" name="item_worth">
+                                </div>
+                                <div class="form-group col-md-6">
+                                    <label for="inputFee">手续费</label>
+                                    <input type="text" class="form-control" id="inputFee" name="item_fee" value="0.12">
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <button type="submit" class="btn btn-primary" style="width: 100%">提交</button>
+                            </div>
+
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="card" style="width: 100%">
+                    <div class="card-header">
+                        计算器
+                    </div>
+                    <div class="card-body">
+                        <form method="post" action="{% url 'Cash:new_form' %}">
+                            {% csrf_token %}
+                            <div class="form-row">
+                                <div class="form-group col-md-6">
+                                    <label for="inputPK">基数</label>
+                                    <input type="text" class="form-control" id="inputPK" value={{ inv }} name="new_inv">
+                                </div>
+                                <div class="form-group col-md-6">
+                                    <label for="inputDate">收益率</label>
+                                    <input type="text" class="form-control" id="inputDate" value="{{ rate }}"
+                                           name="new_rate">
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group col-md-6">
+                                    <label for="inputInvestment">指数杠杆</label>
+                                    <input type="text" class="form-control" id="inputInvestment" value="{{ pow }}"
+                                           name="new_pow">
+                                </div>
+                                <div class="form-group col-md-6">
+                                    <label for="inputShare">因数杠杆</label>
+                                    <input type="text" class="form-control" id="inputShare" value="{{ multi }}" name="new_multi">
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group col-md-6">
+                                    <label for="inputWorth">计算结果</label>
+                                    <input type="text" class="form-control" id="inputWorth" value="{{ result }}">
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-primary">提交</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+</body>
+</html>
