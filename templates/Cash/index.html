@@ -30,7 +30,6 @@
                     <th scope="col">净值</th>
                     <th scope="col">份额</th>
                     <th scope="col">手续费</th>
-                    <th scope="col">动作</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -43,9 +42,6 @@
                         <td>{{ item.worth }}</td>
                         <td>{{ item.share }}</td>
                         <td>{{ item.fee }}</td>
-                        <td>
-                            <a class="btn btn-primary">Del</a>
-                        </td>
                     </tr>
 
                 {% endfor %}
